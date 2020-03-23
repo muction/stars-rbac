@@ -9,7 +9,7 @@ class RoleEntity extends EntityEntity
 
     protected $fillable = ['title' ,'display_name' ,'description' ,'status'];
 
-    protected $with = ['permissions'];
+    protected $with = ['permissions' ,'menus'];
 
     use TraitRole ;
 
@@ -69,15 +69,23 @@ class RoleEntity extends EntityEntity
      * @param array $permissionIds
      * @return bool|mixed
      */
-    public static function bindPermission(int $roleId, array $permissionIds){
+    public static function bindPermission(int $roleId, array $permissionIds , $menus ){
         $role = self::info ( $roleId );
         if(!$role){
             return false;
         }
+        //清除原配置角色
         $role->permissions()->detach();
 
         if($permissionIds){
             $role->permissions()->attach( $permissionIds , self::now() );
+        }
+
+        //清除原配置菜单
+        $role->menus()->detach();
+
+        if( $menus && is_array($menus) ){
+            $role->menus()->attach( $menus , self::now() );
         }
         return $role;
     }

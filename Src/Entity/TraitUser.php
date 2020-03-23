@@ -3,6 +3,7 @@ namespace Stars\Rbac\Entity;
 
 use Illuminate\Support\Facades\Auth;
 use Stars\Peace\Entity\AttachmentEntity;
+use Stars\Peace\Entity\RoleMenusEntity;
 
 trait TraitUser
 {
@@ -32,7 +33,6 @@ trait TraitUser
      * @return mixed
      */
     public static function can( $permission ){
-
         return self::join('role_users' , 'role_users.user_id' ,'=' , 'users.id' )
             ->join( 'roles' ,'roles.id','=' , 'role_users.role_id')
             ->join( 'role_permissions' ,'roles.id','=' , 'role_permissions.role_id')
@@ -57,11 +57,18 @@ trait TraitUser
 
         $info= self::info( Auth::id() );
         $info = $info ? $info->toArray() : [];
+
+        //加入一些数据
+        if( isset($info['roles']) && $info['roles'] ){
+            $roleIds = array_column( $info['roles'] , 'id') ;
+            $ids = RoleMenusEntity::allMenuIds( $roleIds );
+            $info['menus']  = $ids  ? array_unique( $ids->toArray() ): [];
+        }
+
         if( $key ){
             //头像
             if(in_array( $key , ['portrait'] )){
-                return isset( $info['portrait_info']['save_file_path'] ) ?
-                    $info['portrait_info']['save_file_path'].'/'.$info['portrait_info']['save_file_name'] : '';
+                return isset( $info['portrait_info']['save_file_path'] ) ? asset('storage/'.$info['portrait_info']['save_file_path'].'/'.$info['portrait_info']['save_file_name'] ): '';
             }
             return isset( $info[$key] ) && $key ? $info[$key] : '';
         }
