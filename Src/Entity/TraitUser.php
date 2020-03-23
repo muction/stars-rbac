@@ -3,6 +3,7 @@ namespace Stars\Rbac\Entity;
 
 use Illuminate\Support\Facades\Auth;
 use Stars\Peace\Entity\AttachmentEntity;
+use Stars\Peace\Entity\RoleMenusEntity;
 
 trait TraitUser
 {
@@ -56,6 +57,14 @@ trait TraitUser
 
         $info= self::info( Auth::id() );
         $info = $info ? $info->toArray() : [];
+
+        //加入一些数据
+        if( isset($info['roles']) && $info['roles'] ){
+            $roleIds = array_column( $info['roles'] , 'id') ;
+            $ids = RoleMenusEntity::allMenuIds( $roleIds );
+            $info['menus']  = $ids  ? array_unique( $ids->toArray() ): [];
+        }
+
         if( $key ){
             //头像
             if(in_array( $key , ['portrait'] )){
