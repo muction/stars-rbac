@@ -10,7 +10,7 @@ class UserEntity extends EntityEntity
 
     protected $table = 'users';
 
-    protected $fillable = [ 'username' ,'password' ,'email' ,'phone' ,'portrait' ,'branch' , 'status' ,'last_login_time'];
+    protected $fillable = [ 'username' ,'password' ,'email' ,'phone' ,'portrait' ,'branch' , 'status' ,'last_login_time','pro_id','center_id'];
 
     protected $with = ['roles'];
 
